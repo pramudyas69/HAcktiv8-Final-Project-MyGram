@@ -34,6 +34,11 @@ func (s *socialMediaService) AddSocialMedia(userID uint, socialMediaPayload *dto
 		UserID:         userID,
 	}
 
+	err := helpers.ValidateUrl(entity.SocialMediaURL)
+	if err != nil {
+		return nil, err
+	}
+
 	socialMedia, err := s.socialMediaRepository.AddSocialMedia(&entity)
 	if err != nil {
 		return nil, err
@@ -72,6 +77,11 @@ func (s *socialMediaService) EditSocialMediaData(socialMediaID uint, socialMedia
 	entity := entity.SocialMedia{
 		Name:           socialMediaPayload.Name,
 		SocialMediaURL: socialMediaPayload.SocialMediaURL,
+	}
+
+	err := helpers.ValidateUrl(entity.SocialMediaURL)
+	if err != nil {
+		return nil, err
 	}
 
 	socialMedia, err := s.socialMediaRepository.EditSocialMediaData(socialMediaID, &entity)

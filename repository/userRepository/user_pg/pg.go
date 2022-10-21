@@ -46,13 +46,19 @@ func (u *userPG) Login(userPayload *entity.User) (*entity.User, errs.MessageErr)
 func (u *userPG) Register(userPayload *entity.User) (*entity.User, errs.MessageErr) {
 	user := entity.User{}
 
-	err := u.db.Create(userPayload).Error
-	if err != nil {
+	if checkEmail := u.db.Model(user).Where("email = ?", userPayload.Email).Find(&user); checkEmail.RowsAffected > 0 {
+		return nil, errs.NewBadRequest("Email is exist")
+	}
+
+	if checkUsername := u.db.Model(user).Where("username = ?", userPayload.Username).Find(&user); checkUsername.RowsAffected > 0 {
+		return nil, errs.NewBadRequest("Username is exist")
+	}
+
+	if err := u.db.Create(userPayload).Error; err != nil {
 		return nil, errs.NewInternalServerErrorr("Something went wrong")
 	}
 
-	err = u.db.Where("email = ?", userPayload.Email).Take(&user).Error
-	if err != nil {
+	if err := u.db.Where("email = ?", userPayload.Email).Take(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errs.NewNotFoundError("User not found")
 		}

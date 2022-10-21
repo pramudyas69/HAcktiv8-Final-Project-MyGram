@@ -31,6 +31,7 @@ func StartDB() {
 	if err != nil {
 		log.Fatal("Error connecting to database: ", err)
 	}
+	//db.Migrator().DropTable(entity.User{}, entity.Photo{}, entity.SocialMedia{}, entity.Comment{})
 
 	db.AutoMigrate(entity.User{}, entity.Photo{}, entity.SocialMedia{}, entity.Comment{})
 }

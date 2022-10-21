@@ -6,6 +6,7 @@ import (
 	"MyGramHacktiv8/repository/commentRepository"
 	"fmt"
 	"gorm.io/gorm"
+	//"text/template/parse"
 )
 
 type commentPG struct {
@@ -19,9 +20,15 @@ func NewCommentPG(db *gorm.DB) commentRepository.CommentRepository {
 func (c *commentPG) PostComment(commentPayload *entity.Comment) (*entity.Comment, errs.MessageErr) {
 	comment := entity.Comment{}
 	comment.UserID = commentPayload.UserID
+	photo := entity.Photo{}
+
+	if err := c.db.Model(photo).Where("id = ?", commentPayload.PhotoID).First(&photo).Error; err != nil {
+		fmt.Println(commentPayload.PhotoID)
+		return nil, errs.NewNotFoundError("Not found")
+	}
 
 	if err := c.db.Model(&comment).Create(&commentPayload).Error; err != nil {
-		return nil, errs.NewInternalServerErrorr("Something went wrong")
+		return nil, errs.NewInternalServerErrorr("went wrong")
 	}
 
 	if err := c.db.Last(&comment).Error; err != nil {
@@ -54,7 +61,7 @@ func (c *commentPG) GetCommentByID(commentID uint) (*entity.Comment, errs.Messag
 
 func (c *commentPG) EditCommentData(commentID uint, commentPayload *entity.Comment) (*entity.Comment, errs.MessageErr) {
 	comment := entity.Comment{}
-	fmt.Println("Melihat payload", commentPayload)
+	//fmt.Println("Melihat payload", commentPayload)
 
 	err := c.db.Model(&comment).Where("id = ?", commentID).Updates(&commentPayload).Take(&comment).Error
 	if err != nil {
@@ -71,7 +78,7 @@ func (c *commentPG) DeleteComment(commentID uint) errs.MessageErr {
 	comment := entity.Comment{}
 
 	if err := c.db.Where("id = ?", commentID).Delete(&comment).Error; err != nil {
-		return errs.NewInternalServerErrorr("Something went wrong")
+		return errs.NewNotFoundError("Not found")
 	}
 
 	return nil

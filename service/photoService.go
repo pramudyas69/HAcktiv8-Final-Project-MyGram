@@ -25,8 +25,8 @@ func NewPhotoService(photoRepository photoRepository.PhotoRepository) PhotoServi
 }
 
 func (p *photoService) PostPhoto(userID uint, photoPayload *dto.PhotoRequest) (*dto.PhotoResponse, errs.MessageErr) {
-	err := helpers.ValidateStruct(photoPayload)
-	if err != nil {
+
+	if err := helpers.ValidateStruct(photoPayload); err != nil {
 		return nil, err
 	}
 
@@ -35,6 +35,11 @@ func (p *photoService) PostPhoto(userID uint, photoPayload *dto.PhotoRequest) (*
 		Caption:  photoPayload.Caption,
 		PhotoURL: photoPayload.PhotoURL,
 		UserID:   userID,
+	}
+
+	err := helpers.ValidateUrl(payload.PhotoURL)
+	if err != nil {
+		return nil, err
 	}
 
 	photo, err := p.photoRepository.PostPhoto(payload)
@@ -69,8 +74,8 @@ func (p *photoService) GetAllPhotos() ([]*dto.GetPhotoResponse, errs.MessageErr)
 }
 
 func (p *photoService) EditPhotoData(photoID uint, photoPayload *dto.PhotoRequest) (*dto.PhotoUpdateResponse, errs.MessageErr) {
-	err := helpers.ValidateStruct(photoPayload)
-	if err != nil {
+
+	if err := helpers.ValidateStruct(photoPayload); err != nil {
 		return nil, err
 	}
 
@@ -78,6 +83,11 @@ func (p *photoService) EditPhotoData(photoID uint, photoPayload *dto.PhotoReques
 		Title:    photoPayload.Title,
 		Caption:  photoPayload.Caption,
 		PhotoURL: photoPayload.PhotoURL,
+	}
+
+	err := helpers.ValidateUrl(payload.PhotoURL)
+	if err != nil {
+		return nil, err
 	}
 
 	photo, err := p.photoRepository.EditPhotoData(photoID, payload)

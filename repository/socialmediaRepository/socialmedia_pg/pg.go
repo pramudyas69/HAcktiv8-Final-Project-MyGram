@@ -4,6 +4,7 @@ import (
 	"MyGramHacktiv8/entity"
 	"MyGramHacktiv8/pkg/errs"
 	"MyGramHacktiv8/repository/socialmediaRepository"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -73,6 +74,7 @@ func (s *socialMediaPG) DeleteSocialMedia(socialMediaID uint) errs.MessageErr {
 
 	if err := s.db.Model(socialMedia).Where("id = ?", socialMediaID).Delete(&socialMedia).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
+			fmt.Println("ga ada cuy idnya")
 			return errs.NewNotFoundError("Social media not found")
 		}
 		return errs.NewInternalServerErrorr("Something went wrong")
